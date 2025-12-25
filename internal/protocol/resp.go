@@ -26,7 +26,7 @@ func readLine(r *bufio.Reader) (string, error) {
 func readBulkString(r *bufio.Reader) (string, error) {
 	line, err := readLine(r)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	if len(line) == 0 || line[0] != '$' {

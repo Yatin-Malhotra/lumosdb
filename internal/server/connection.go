@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Yatin-Malhotra/lumosdb/internal/protocol"
 )
@@ -31,7 +33,7 @@ func (s *Server) handleConnection(conn net.Conn) {
 			writer.WriteString("+PONG\r\n")
 
 		case "SET":
-			if len(cmd.Args) != 2 {
+			if len(cmd.Args) != 2 && len(cmd.Args) != 4 {
 				writer.WriteString("-ERR invalid number of arguments provided\r\n")
 				break
 			}
@@ -39,7 +41,24 @@ func (s *Server) handleConnection(conn net.Conn) {
 			key := cmd.Args[0]
 			value := cmd.Args[1]
 
-			s.Store.Set(key, value, 0)
+			var ttl time.Duration
+
+			if len(cmd.Args) == 4 {
+				if strings.ToUpper(cmd.Args[2]) != "PX" {
+					writer.WriteString("-ERR syntax error\r\n")
+					break
+				}
+
+				ms, err := strconv.Atoi(cmd.Args[3])
+				if err != nil || ms <= 0 {
+					writer.WriteString("-ERR invalid PX value\r\n")
+					break
+				}
+
+				ttl = time.Duration(ms) * time.Millisecond
+			}
+
+			s.Store.Set(key, value, ttl)
 			writer.WriteString("+OK\r\n")
 
 		case "GET":

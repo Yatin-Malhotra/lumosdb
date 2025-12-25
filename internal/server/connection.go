@@ -2,9 +2,10 @@ package server
 
 import (
 	"bufio"
-	"io"
 	"log"
 	"net"
+
+	"github.com/Yatin-Malhotra/lumosdb/internal/protocol"
 )
 
 func (s *Server) handleConnection(conn net.Conn) {
@@ -16,16 +17,15 @@ func (s *Server) handleConnection(conn net.Conn) {
 	writer := bufio.NewWriter(conn)
 
 	for {
-		line, err := reader.ReadString('\n')
-
+		cmd, err := protocol.ReadCommand(reader)
 		if err != nil {
-			if err != io.EOF {
-				log.Println("Read error:", err)
-			}
+			log.Println("Protocol error:", err)
 			return
 		}
 
-		writer.WriteString(line)
+		log.Printf("Command: %s %v\n", cmd.Name, cmd.Args)
+
+		writer.WriteString("+OK\r\n")
 		writer.Flush()
 	}
 }

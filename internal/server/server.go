@@ -15,7 +15,6 @@ func New(addr string) *Server {
 
 func (s *Server) Start() error {
 	listener, err := net.Listen("tcp", s.Addr)
-
 	if err != nil {
 		return err
 	}
@@ -24,7 +23,6 @@ func (s *Server) Start() error {
 
 	for {
 		conn, err := listener.Accept()
-
 		if err != nil {
 			log.Println("Accept error:", err)
 			continue

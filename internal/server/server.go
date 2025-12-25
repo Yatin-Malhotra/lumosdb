@@ -3,14 +3,20 @@ package server
 import (
 	"log"
 	"net"
+
+	"github.com/Yatin-Malhotra/lumosdb/internal/storage"
 )
 
 type Server struct {
-	Addr string
+	Addr  string
+	Store *storage.Store
 }
 
 func New(addr string) *Server {
-	return &Server{Addr: addr}
+	return &Server{
+		Addr:  addr,
+		Store: storage.NewStore(),
+	}
 }
 
 func (s *Server) Start() error {
